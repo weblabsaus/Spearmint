@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSV Marketplace Parser</title>
+    <title>SpearMint Marketplace</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
         body {
@@ -17,11 +17,18 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            text-align: center;
+        }
+        header {
+            margin-bottom: 20px;
+        }
+        img.logo {
+            width: 150px;
+            border-radius: 8px;
         }
         h1 {
             font-weight: 500;
             color: #212529;
-            margin-bottom: 20px;
         }
         .button-container {
             margin-bottom: 20px;
@@ -60,15 +67,14 @@
             padding: 20px;
             margin-bottom: 20px;
             border-radius: 8px;
-            border: 1px solid #e9ecef;
-            transition: background-color 0.3s, transform 0.2s;
+            border: 1px solid #dee2e6;
+            transition: transform 0.2s;
         }
         .item:hover {
-            background-color: #f1f3f5;
             transform: scale(1.02);
         }
         .item img {
-            max-width: 140px;
+            max-width: 120px;
             height: auto;
             margin-top: 10px;
             border-radius: 8px;
@@ -76,7 +82,81 @@
         .item-details {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         .item-details a {
-            color: #007b
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .item-details a:hover {
+            color: #0056b3;
+        }
+        .item-details strong {
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://i.ibb.co/DCLmPrc/Shop-Market-logo-1.png" alt="SpearMint Logo" class="logo">
+        <h1>SpearMint Marketplace</h1>
+    </header>
+    <div class="button-container">
+        <button class="button" id="fetchDataButton">Fetch Data from Google Sheets</button>
+        <button class="button" id="postButton">Post</button>
+    </div>
+    <div class="item-list" id="itemList"></div>
+
+    <script>
+        document.getElementById('fetchDataButton').addEventListener('click', function () {
+            fetchData();
+        });
+
+        document.getElementById('postButton').addEventListener('click', function () {
+            // Replace with your desired URL
+            const postUrl = 'https://your-target-url.com';
+            window.location.href = postUrl;
+        });
+
+        function fetchData() {
+            const csvUrl = 'https://docs.google.com/spreadsheets/d/1WKemJFGCtg_ELn8wIuYXUPPQFLoU94Iqo3hsNIc_mMo/pub?output=csv';
+            fetch(csvUrl)
+                .then(response => response.text())
+                .then(data => parseCSV(data))
+                .catch(error => console.error('Error fetching the CSV:', error));
+        }
+
+        function parseCSV(csv) {
+            const rows = csv.split('\n').slice(1); // Ignore the header
+            const itemList = document.getElementById('itemList');
+            itemList.innerHTML = ''; // Clear previous items
+
+            rows.forEach(row => {
+                const columns = row.split(',');
+
+                if (columns.length < 8) return; // Ignore rows with incomplete data
+
+                const item = document.createElement('div');
+                item.classList.add('item');
+                item.innerHTML = `
+                    <div class="item-details">
+                        <strong>Timestamp:</strong> ${columns[0]}<br>
+                        <strong>Product Name:</strong> ${columns[1]}<br>
+                        <strong>Product Description:</strong> ${columns[2]}<br>
+                        <strong>Author/Company Name:</strong> ${columns[3]}<br>
+                        <strong>Availability:</strong> ${columns[4]}<br>
+                        <strong>Price:</strong> ${columns[5]}<br>
+                        <strong>Product Website:</strong> <a href="${columns[6]}" target="_blank">${columns[6]}</a>
+                    </div>
+                    ${columns[7] ? `<img src="${columns[7]}" alt="Product Image">` : ''}
+                `;
+                itemList.appendChild(item);
+            });
+        }
+
+        // Auto-fetch data on page load
+        window.addEventListener('load', fetchData);
+    </script>
+</body>
+</html>
