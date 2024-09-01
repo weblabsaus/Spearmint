@@ -4,32 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSV Marketplace Parser</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-weight: 500;
+            color: #222;
+            text-align: center;
+        }
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #0056b3;
         }
         .item-list {
-            max-height: 400px;
+            max-height: 500px;
             overflow-y: auto;
-            border: 1px solid #ddd;
+            border-radius: 8px;
             padding: 10px;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .item {
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            margin-bottom: 15px;
             border-bottom: 1px solid #eee;
-            padding: 10px 0;
+            transition: transform 0.2s;
+        }
+        .item:last-child {
+            border-bottom: none;
+        }
+        .item:hover {
+            transform: scale(1.02);
         }
         .item img {
-            max-width: 100px;
+            max-width: 120px;
             height: auto;
-            display: block;
-            margin-bottom: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .item-details {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .item-details a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .item-details a:hover {
+            color: #0056b3;
+        }
+        .item-details strong {
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
     <h1>Marketplace Items</h1>
-    <button id="fetchDataButton">Fetch Data from Google Sheets</button>
+    <div class="button-container">
+        <button class="button" id="fetchDataButton">Fetch Data from Google Sheets</button>
+        <button class="button" id="postButton">Post</button>
+    </div>
     <div class="item-list" id="itemList"></div>
 
     <script>
@@ -39,6 +100,12 @@
                 .then(response => response.text())
                 .then(data => parseCSV(data))
                 .catch(error => console.error('Error fetching the CSV:', error));
+        });
+
+        document.getElementById('postButton').addEventListener('click', function () {
+            // Replace with your desired URL
+            const postUrl = 'https://forms.gle/2vBDa8Xxnr9gmXRD9';
+            window.location.href = postUrl;
         });
 
         function parseCSV(csv) {
@@ -54,13 +121,15 @@
                 const item = document.createElement('div');
                 item.classList.add('item');
                 item.innerHTML = `
-                    <strong>Timestamp:</strong> ${columns[0]}<br>
-                    <strong>Product Name:</strong> ${columns[1]}<br>
-                    <strong>Product Description:</strong> ${columns[2]}<br>
-                    <strong>Author/Company Name:</strong> ${columns[3]}<br>
-                    <strong>Availability:</strong> ${columns[4]}<br>
-                    <strong>Price:</strong> ${columns[5]}<br>
-                    <strong>Product Website:</strong> <a href="${columns[6]}" target="_blank">${columns[6]}</a><br>
+                    <div class="item-details">
+                        <strong>Timestamp:</strong> ${columns[0]}<br>
+                        <strong>Product Name:</strong> ${columns[1]}<br>
+                        <strong>Product Description:</strong> ${columns[2]}<br>
+                        <strong>Author/Company Name:</strong> ${columns[3]}<br>
+                        <strong>Availability:</strong> ${columns[4]}<br>
+                        <strong>Price:</strong> ${columns[5]}<br>
+                        <strong>Product Website:</strong> <a href="${columns[6]}" target="_blank">${columns[6]}</a>
+                    </div>
                     ${columns[7] ? `<img src="${columns[7]}" alt="Product Image">` : ''}
                 `;
                 itemList.appendChild(item);
